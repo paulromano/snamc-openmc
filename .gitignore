@@ -1,0 +1,12 @@
+# PDF files produced
+*.pdf
+
+# emacs temporaries
+*~
+
+# LateX output
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
