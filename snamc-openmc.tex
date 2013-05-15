@@ -83,8 +83,9 @@ Development of OpenMC was spearheaded by the Computational Reactor Physics Group
 (CRPG) at Massachusetts Institute of Technology (MIT) as part of a project to
 develop scalable parallel algorithms for future exascale supercomputers. While
 this was the original focus of the code development efforts, there are now a
-wide variety of research and development efforts underway using OpenMC. In the
-last year, the development team has also grown to span multiple
+wide variety of research and development efforts underway using OpenMC
+\cite{mc-romano-2013, mc-nelson-2013, jcp-siegel-2013, ijhpca-siegel-2013}. In
+the last year, the development team has also grown to span multiple
 organizations.
 
 Various aspects of the OpenMC code have been described previously
@@ -197,25 +198,26 @@ Reactor (ATR).
 
 In addition to 2D raster plotting, a new plotting capability has been added to
 OpenMC that allows for the visualization of geometry in 3D using standard
-viewers such as ParaView and Visit. By specifying a uniform rectilinear grid of
-voxels (analogous to image pixels), users can produce a binary file containing
-the cell or material ids for each cell in the grid.  These files are created
-with the same raster method used by the 2D plotter in OpenMC, where a
-'find\_cell' routine is called to determine the attributes of the geometry at
-each voxel center.  Since this 'find\_cell' routine is the same one used during
-simulation, the voxel information produced by this method is representative of
-the actual simulation geometry, limited only by the user-specified granularity
-of the voxels.
+viewers such as ParaView \cite{squillicote-2007} and VisIt \cite{visit-2005}. By
+specifying a uniform rectilinear grid of voxels (analogous to image pixels),
+users can produce a binary file containing the cell or material ids for each
+cell in the grid.  These files are created with the same raster method used by
+the 2D plotter in OpenMC, where a 'find\_cell' routine is called to determine
+the attributes of the geometry at each voxel center.  Since this 'find\_cell'
+routine is the same one used during simulation, the voxel information produced
+by this method is representative of the actual simulation geometry, limited only
+by the user-specified granularity of the voxels.
 
 Once the voxel binary file is produced, users can process the data into a
 standard 3D datafile and visualize however desired.  For convenience, a Python
-utility is provided to convert voxel files into either SILO or VTK files that
-can be viewed in many well-established 3D data visualization tools. The example
-provided by this utility easily enables users to write custom scripts that
-section geometry features or mask specific cells or materials. For example,
-\autoref{fig:grid-spacer} and \autoref{fig:burnable-absorber} show plots of a
-PWR grid spacer and burnable absorber pin, respectively, with various materials
-and features clipped for easy inspection of the geometry.
+utility is provided to convert voxel files into either SILO \cite{silo-2010} or
+VTK \cite{vtk-2010} files that can be viewed in many well-established 3D data
+visualization tools. The example provided by this utility easily enables users
+to write custom scripts that section geometry features or mask specific cells or
+materials. For example, \autoref{fig:grid-spacer} and
+\autoref{fig:burnable-absorber} show plots of a PWR grid spacer and burnable
+absorber pin, respectively, with various materials and features clipped for easy
+inspection of the geometry.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.4\textwidth]{images/spacer.png}
@@ -523,10 +525,10 @@ process mesh tallies from statepoints into VTK or SILO files.  For example,
 \end{figure}
 
 State point files (and other binary files) can be written either in a raw binary
-format or in HDF5 format. While the HDF5 format should be preferred and ensures
-portability across different architectures, the former is made available to
-ensure that users can take advantage of state point capabilities even on systems
-where HDF5 is unavailable.
+format or in HDF5 format \cite{hdf5-koranne-2011}. While the HDF5 format should
+be preferred and ensures portability across different architectures, the former
+is made available to ensure that users can take advantage of state point
+capabilities even on systems where HDF5 is unavailable.
 
 One recent capability added to OpenMC is the ability to create \textbf{particle
   restart files}. These files contain a particle's attributes at birth, as well
