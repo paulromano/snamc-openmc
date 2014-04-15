@@ -1,16 +1,36 @@
-\documentclass{snamc2013}
+\documentclass[5p,authoryear]{elsarticle}
+\journal{Annals of Nuclear Energy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[charter]{mathdesign} % Type-1 Latin Modern modern
+\usepackage[T1]{fontenc}         % Use T1 encoding instead of OT1
 \usepackage[utf8]{inputenc} % Use UTF8 input encoding
 \usepackage{graphicx}       % allows inclusion of graphics
 \usepackage{booktabs}       % nice rules (thick lines) for tables
 \usepackage{microtype}      % improves typography for PDF
 
-% Configuration for source code listings
 \usepackage{color}
 \definecolor{gray}{rgb}{0.4,0.4,0.4}
 \definecolor{darkblue}{rgb}{0.0,0.0,0.6}
 \definecolor{cyan}{rgb}{0.0,0.6,0.6}
+\definecolor{aneblue}{RGB}{0,128,173}
+
+% Set up hyperlinking
+\usepackage[colorlinks,breaklinks]{hyperref}
+\AtBeginDocument{
+  \hypersetup{linkcolor=aneblue, citecolor=aneblue, urlcolor=aneblue}
+}
+
+% Captions for figures and tables
+\usepackage[labelfont=bf]{caption}
+\captionsetup[figure]{labelsep=period, name=Fig.}
+\captionsetup[table]{labelsep=newline}
+
+% Set correct abbreviations
+\def\equationautorefname{Eq.}
+\def\figureautorefname{Fig.}
+
+% Configuration for source code listings
 \usepackage{listings}
 \lstset{
   basicstyle=\footnotesize\ttfamily,
@@ -31,30 +51,37 @@
   morekeywords={}
 }
 
-% Set up hyperlinking
-\usepackage[breaklinks=true, linkcolor=black, citecolor=black]{hyperref}
-\hypersetup{colorlinks=true, urlcolor=black,
-  pdftitle={OpenMC: A State-of-the-Art Monte Carlo Code for Research and
-    Development},
-  pdfauthor={Paul K. Romano et al.}}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{OpenMC: A State-of-the-Art Monte Carlo Code for Research and
-  Development}
+\begin{document}
 
-\author[1]{Paul K. Romano}
-\author[1]{Nicholas E. Horelik}
-\author[1]{Bryan R. Herman}
-\author[2]{Adam G. Nelson}
-\author[1]{Benoit Forget}
-\author[1]{Kord Smith}
+\title{OpenMC: A State-of-the-Art Monte Carlo Code for Research and Development}
 
-\affil[1]{Massachusetts Institute of Technology, Department of Nuclear Science
-  and Engineering, 77 Massachusetts Avenue, Cambridge, MA 02139}
-\affil[2]{University of Michigan, Department of Nuclear Engineering and
-  Radiological Sciences, 2355 Bonisteel Boulevard, Ann Arbor, MI 48104}
+\author[mit]{Paul K. Romano\corref{cor1}}
+\ead{paul.romano@alum.mit.edu}
+\cortext[cor1]{Corresponding author. Tel.: +1 518 395 3010.}
 
-\abstract{This paper gives an overview of OpenMC, an open source Monte Carlo
+\author[mit]{Nicholas E. Horelik}
+\ead{nhorelik@mit.edu}
+
+\author[mit]{Bryan R. Herman}
+\ead{bherman@mit.edu}
+
+\author[umich]{Adam G. Nelson}
+\ead{nelsonag@umich.edu}
+
+\author[mit]{Benoit Forget}
+\ead{bforget@mit.edu}
+
+\author[mit]{Kord Smith}
+\ead{kord@mit.edu}
+
+\address[mit]{Massachusetts Institute of Technology, Department of Nuclear
+  Science and Engineering \\ 77 Massachusetts Avenue, Cambridge, MA 02139}
+\address[umich]{University of Michigan, Department of Nuclear Engineering and
+  Radiological Sciences \\ 2355 Bonisteel Boulevard, Ann Arbor, MI 48104}
+
+\begin{abstract}
+  This paper gives an overview of OpenMC, an open source Monte Carlo
   particle transport code recently developed at the Massachusetts Institute of
   Technology. OpenMC uses continuous-energy cross sections and a constructive
   solid geometry representation, enabling high-fidelity modeling of nuclear
@@ -63,11 +90,15 @@
   algorithms in OpenMC have demonstrated near-linear scaling to over 100,000
   processors on modern supercomputers. Other topics discussed in this paper
   include plotting, CMFD acceleration, variance reduction, eigenvalue
-  calculations, and software development processes.}
+  calculations, and software development processes.
+\end{abstract}
 
-\keywords{Monte Carlo, neutron transport, OpenMC, parallel, XML, HDF5}
+\begin{keyword}
+  Monte Carlo, neutron transport, OpenMC, parallel, XML, HDF5
+\end{keyword}
 
-\begin{document}
+\maketitle
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
@@ -75,7 +106,7 @@ OpenMC is a relatively young Monte Carlo particle transport code, having been
 developed starting in 2011 and first released to the public in December
 2012. While the code does not benefit from decades of experience and feedback
 from users as do other popular Monte Carlo codes such as MCNP
-\cite{lanl-brown-2010} and TRIPOLI \cite{phytra-diop-2007}, it nevertheless
+\citep{lanl-brown-2010} and TRIPOLI \citep{phytra-diop-2007}, it nevertheless
 possesses a number of features that may be very attractive to both users and
 developers.
 
@@ -84,15 +115,15 @@ Development of OpenMC was spearheaded by the Computational Reactor Physics Group
 develop scalable parallel algorithms for future exascale supercomputers. While
 this was the original focus of the code development efforts, there are now a
 wide variety of research and development efforts underway using OpenMC
-\cite{mc-romano-2013, mc-nelson-2013, jcp-siegel-2013, ijhpca-siegel-2013}. In
-the last year, the development team has also grown to span multiple
-organizations.
+\citep{jcp-romano-2013, mc-nelson-2013, jcp-siegel-2013, ijhpca-siegel-2014,
+  cpc-siegel-2014, ane-forget-2014}. In the last year, the development team has
+also grown to span multiple organizations.
 
 Various aspects of the OpenMC code have been described previously
-\cite{ane-romano-2013, mc-romano-2013}. However, due to the developmental nature
-of the code, many changes have been, and continue to be, made. The objective of
-the present work is to give a fairly complete and up-to-date overview of the
-present capabilities and features of OpenMC.
+\citep{ane-romano-2013, mc-romano-2013}. However, due to the developmental
+nature of the code, many changes have been, and continue to be, made. The
+objective of the present work is to give a fairly complete and up-to-date
+overview of the present capabilities and features of OpenMC.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Methods}
@@ -103,16 +134,16 @@ At the present time, OpenMC is capable of simulating only neutrons either in
 fixed source\footnote{Subcritical multiplication problems are not yet
   supported.} or $k$-eigenvalue problems. The data governing the interaction of
 neutrons with various nuclei are represented using the ACE format
-\cite{lanl-x5-2008-ace} which is also used by MCNP and Serpent
-\cite{vtt-leppanen-2012}. ACE-format data can be generated with the NJOY nuclear
-data processing system \cite{lanl-macfarlane-2012} which converts raw ENDF/B
+\citep{lanl-x5-2008-ace} which is also used by MCNP and Serpent
+\citep{vtt-leppanen-2012}. ACE-format data can be generated with the NJOY nuclear
+data processing system \citep{lanl-macfarlane-2012} which converts raw ENDF/B
 data into a representation that is suitable for use in a Monte Carlo code. The
 use of a standard cross section format allows for a direct comparison of OpenMC
 with other codes since the same cross section libraries can be used. However,
 the downside is that the implementation of physical methods is necessarily
 limited by the data that is available in the ACE format.
 
-An indexing technique \cite{ane-leppanen-2009} based on pointers is used to
+An indexing technique \citep{ane-leppanen-2009} based on pointers is used to
 speed up energy grid searches when calculating cross sections. For problems with
 tens of nuclides or less, the indexing technique provides a considerable
 performance benefit with modest additional memory requirements. However, with
@@ -128,7 +159,7 @@ implemented, and thus OpenMC does not explicitly track photon production
 resulting from $(n,\gamma)$ or fission reactions.
 
 To properly treat scattering kinematics when the target nucleus is not at rest,
-OpenMC uses a free gas approximation \cite{mc-sutton-2009} wherein the
+OpenMC uses a free gas approximation \citep{mc-sutton-2009} wherein the
 velocities of the target nuclei are sampled from a Maxwellian distribution. For
 thermal neutrons scattering from bound molecules such as hydrogen or deuterium
 in water, graphite, beryllium, etc., the free gas approximation will not
@@ -136,13 +167,13 @@ accurately capture the scattering kinematics and $S(\alpha,\beta,T)$ scattering
 law data must be used. The $S(\alpha,\beta,T)$ data are given on ACE files
 separate from the normal nuclide data. To account for self-shielding in the
 unresolved resonance range, OpenMC uses the probability table method
-\cite{nse-levitt-1972}. Probability tables are included in the ACE data for many
+\citep{nse-levitt-1972}. Probability tables are included in the ACE data for many
 nuclides.
 
-The method of successive generations \cite{nukleonik-lieberoth-1968} is used to
+The method of successive generations \citep{nukleonik-lieberoth-1968} is used to
 solve $k$-eigenvalue problems. The user also has the option to group multiple
 generations into a ``batch'' to reduce correlation between realizations of the
-tally random variables \cite{physor-kelly-2012}. Like MCNP, OpenMC keeps track
+tally random variables \citep{physor-kelly-2012}. Like MCNP, OpenMC keeps track
 of the collision, absorption, and track-length estimators of $k_{eff}$ and then
 calculates a minimum-variance combined estimator based on the covariance matrix
 of the three single estimators. To assess convergence of the source
@@ -198,7 +229,7 @@ Reactor (ATR).
 
 In addition to 2D raster plotting, a new plotting capability has been added to
 OpenMC that allows for the visualization of geometry in 3D using standard
-viewers such as ParaView \cite{squillicote-2007} and VisIt \cite{visit-2005}. By
+viewers such as ParaView \citep{squillicote-2007} and VisIt \citep{visit-2005}. By
 specifying a uniform rectilinear grid of voxels (analogous to image pixels),
 users can produce a binary file containing the cell or material ids for each
 cell in the grid.  These files are created with the same raster method used by
@@ -210,8 +241,8 @@ by the user-specified granularity of the voxels.
 
 Once the voxel binary file is produced, users can process the data into a
 standard 3D datafile and visualize however desired.  For convenience, a Python
-utility is provided to convert voxel files into either SILO \cite{silo-2010} or
-VTK \cite{vtk-2010} files that can be viewed in many well-established 3D data
+utility is provided to convert voxel files into either SILO \citep{silo-2010} or
+VTK \citep{vtk-2010} files that can be viewed in many well-established 3D data
 visualization tools. The example provided by this utility easily enables users
 to write custom scripts that section geometry features or mask specific cells or
 materials. For example, \autoref{fig:grid-spacer} and
@@ -222,7 +253,7 @@ inspection of the geometry.
   \centering
   \includegraphics[width=0.4\textwidth]{images/spacer.png}
   \caption{3D plot of a grid spacer in the BEAVRS benchmark
-    \cite{mc-horelik-2013} as shown in ParaView.}
+    \citep{mc-horelik-2013} as shown in ParaView.}
   \label{fig:grid-spacer}
 \end{figure}
 \begin{figure}[htb]
@@ -238,12 +269,12 @@ inspection of the geometry.
 OpenMC has a flexible, low-overhead tally system which enables users to obtain
 physical results of interest. Tallies are defined by combinations of
 \textit{filters} and \textit{scores}, borrowing terminology from a paper by
-Sutton et al. \cite{mc-sutton-2007}. Each filter limits what events can score to
+Sutton et al. \citep{mc-sutton-2007}. Each filter limits what events can score to
 the tally based on the attributes of the particle. For example, a filter could
 limit scoring events to particles traveling within a specified cell or a
 specified range of pre-collision energies. A full and up-to-date list of filters
 which may be applied to tallies can be found in the OpenMC User's Guide
-\cite{romano-2013-doc}. Each score identifies an actual physical quantity to be
+\citep{romano-2013-doc}. Each score identifies an actual physical quantity to be
 scored upon an event which matches the specified filters. Some examples of valid
 scores include the flux, fission reaction rate, neutron production rate, or
 local energy deposition from fission. In addition to a set of defined scores, it
@@ -265,7 +296,7 @@ specify that the track-length or collision estimator should be used for a given
 tally.
 
 Historically, some Monte Carlo codes have suffered severe performance penalties
-when tallying a large number of quantities \cite{pnst-vanveen-2011}. Care must
+when tallying a large number of quantities \citep{pnst-vanveen-2011}. Care must
 be taken to ensure that a tally system scales well with the total number of
 tally bins. In OpenMC, a mapping technique is used that allows for a fast
 determination of what tally/bin combinations need to be scored to a given
@@ -295,15 +326,14 @@ processes. The first algorithm is related to the collection and sampling of
 fission sites, which are stored in an array known as the \textit{fission
   bank}. The algorithm forgoes a typical master-slave communication pattern in
 favor of nearest-neighbor exchanges of fission/source sites. A derivation and
-analysis of the algorithm complexity is given in Romano and
-Forget\cite{nse-romano-2012}; the salient point is that nearest-neighbor
-exchanges, in the context of this algorithm, have an expected communication cost
-$O(\sqrt{N/p})$ whereas the computational work scales as $O(N/p)$. Thus,
-arbitrarily good scaling can be achieved. Previous scaling results were reported
-in~~\cite{ane-romano-2013} for the Jaguar supercomputer at Oak Ridge National
-Laboratory. Those results alongside with new scaling results on the Intrepid
-Blue Gene/P supercomputer at Argonne National Laboratory are shown in
-\autoref{fig:scaling}.
+analysis of the algorithm complexity is given in \citet{nse-romano-2012}; the
+salient point is that nearest-neighbor exchanges, in the context of this
+algorithm, have an expected communication cost $O(\sqrt{N/p})$ whereas the
+computational work scales as $O(N/p)$. Thus, arbitrarily good scaling can be
+achieved. Previous scaling results were reported in~~\citep{ane-romano-2013} for
+the Jaguar supercomputer at Oak Ridge National Laboratory. Those results
+alongside with new scaling results on the Intrepid Blue Gene/P supercomputer at
+Argonne National Laboratory are shown in \autoref{fig:scaling}.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.5\textwidth]{images/scaling_loglog.pdf}
@@ -319,7 +349,7 @@ communication associated with synchronizing tallies across processors is
 proportional to both the number of processors and the number of tally
 bins. Thus, for problems with very large tally requirements, and hence large
 computational requirements, this source of communication can erode parallel
-efficiency. It was shown in \cite{trans-romano-2012} that by grouping
+efficiency. It was shown in \citep{trans-romano-2012} that by grouping
 realizations of tally random variables over successive generations rather than
 over multiple processors, the communication associated with tallies can be
 reduced dramatically. While the reported sample means will not change when this
@@ -340,10 +370,10 @@ can be enabled by the user. The weight cutoff and survival weight are also
 adjustable parameters in the user input.
 
 For $k$-eigenvalue problems, users can optionally use the uniform fission site
-method \cite{physor-kelly-2012} on a Cartesian mesh to help flatten the
+method \citep{physor-kelly-2012} on a Cartesian mesh to help flatten the
 distribution of variance in problems with non-uniform particle densities. The
 effectiveness of this method as implemented in OpenMC is discussed at greater
-length in \cite{mc-romano-2013}. One limitation currently is that the
+length in \citep{mc-romano-2013}. One limitation currently is that the
 implementation assumes that the volume of fuel in each mesh cell is equal. 
 
 \subsection{CMFD Acceleration}
@@ -351,7 +381,7 @@ implementation assumes that the volume of fuel in each mesh cell is equal.
 The coarse mesh finite difference (CMFD) method has been widely applied in
 deterministic nodal diffusion calculations to reduce the number of fission
 source iterations. Recently, CMFD has been applied to reactor calculations using
-multi-group Monte Carlo \cite{physor-lee-2012} to accelerate convergence of the
+multi-group Monte Carlo \citep{physor-lee-2012} to accelerate convergence of the
 fission source. The CMFD acceleration method has been integrated into
 OpenMC. CMFD acceleration works by solving the multi-group neutron diffusion
 equation after each Monte Carlo batch to obtain a better estimate of the global
@@ -367,7 +397,7 @@ fission source. This process can be characterized by three steps:
 
 In order to use CMFD acceleration, the user needs to specify the mesh over which
 to calculate multi-group cross sections. Solution of the linear system of
-diffusion equations relies on PETSc \cite{petsc-2013}, and so OpenMC must be
+diffusion equations relies on PETSc \citep{petsc-2013}, and so OpenMC must be
 compiled against the PETSc libraries.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -377,21 +407,22 @@ OpenMC is written in standard Fortran 2008. While C and C++ were considered as
 other possible languages for development, ultimately Fortran 2008 was chosen due
 to MIT's research focus on parallel algorithms coupled with the availability of
 co-array features in the Fortran 2008 standard. For input processing, OpenMC
-relies on a modified version of the xml-fortran \cite{markus-2008}
-parser. Almost all important data are encapsulated in derived types. While
-object-oriented features are available in Fortran 2008, their use in OpenMC is
-largely precluded by limited compiler support.
+relies on the FoX XML library \citep{walker-2014} which provides a complete
+implementation of the W3C document object model (DOM). Almost all important data
+are encapsulated in derived types. While object-oriented features are available
+in Fortran 2008, their use in OpenMC is largely precluded by limited compiler
+support.
 
 \subsection{Compilation and Installation}
 
 OpenMC has been successfully compiled with the gfortran, Intel, PGI, Cray, and
 IBM compilers on various platforms/architectures including several Linux
 distributions, Mac OS X, and Windows 7. On Windows, OpenMC can be compiled using
-gfortran within cygwin or the MinGW port of gcc. Recently, a binary package has
-been available for Debian derivatives via an Ubuntu Personal Package Archive
-(PPA). By installing from the binary package, the package manager ensures that
-all dependencies, e.g., MPI, are satisfied, and the user is spared the trouble
-of building the code.
+gfortran within cygwin or the MinGW port of gcc. Recently, binary packages have
+been made available for Debian derivatives via an Ubuntu Personal Package
+Archive (PPA) as well as for Arch Linux. By installing from the binary package,
+the package manager ensures that all dependencies, e.g., MPI, are satisfied, and
+the user is spared the trouble of building the code.
 
 \subsection{Input/Output}
 
@@ -399,7 +430,7 @@ of building the code.
 
 OpenMC uses Extensible Markup Language (XML) for all user input files. The use
 of XML enables developers to make changes to the user input format easily,
-adding or modifying options, and the xml-fortran parser within OpenMC gracefully
+adding or modifying options, and the FoX library within OpenMC gracefully
 handles the changes with little effort from the developer. Users are free to
 form their input files as they wish, as long as the overall structure of the
 files is well-formed and the content conforms to the specification of the file.
@@ -432,7 +463,7 @@ files:
 As one example of the XML format, \autoref{fig:materials-xml} shows the
 materials.xml describing two materials used in the U233-MET-FAST-002 benchmark
 from the International Handbook of Evaluated Criticality Safety Benchmark
-Experiments \cite{icsbep-2012}.
+Experiments \citep{icsbep-2012}.
 \begin{figure}[htb]
   \begin{lstlisting}[language=xml]
 <?xml version="1.0"?>
@@ -459,12 +490,12 @@ Experiments \cite{icsbep-2012}.
   \label{fig:materials-xml}
 \end{figure}
 
-A set of schemata based on the RELAX NG schema language \cite{relaxng-2008}
+A set of schemata based on the RELAX NG schema language \citep{relaxng-2008}
 makes it possible to verify not only that an input file is well-formed but also
 that it has the correct tags, attributes, and datatypes. There are two ways that
 input files can be checked for conformance against the schemata. The first
 method is post-validation where an input file is checked against a corresponding
-schema using a tool such as \texttt{jing} \cite{jing-2012}. A more elegant
+schema using a tool such as \texttt{jing} \citep{jing-2012}. A more elegant
 method to check conformance is real-time validation with an editor such as GNU
 Emacs. When using GNU Emacs to write an input file, the input is continually
 checked against a corresponding schema (based on the root element in the
@@ -505,16 +536,16 @@ post-processing tally results.  By itself, a state point file is not very useful
 since it is in an arbitrary binary format. However, a Python module,
 statepoint.py, is available that makes it easy and intuitive to extract and
 visualize tally results. In addition, a graphical user interface built on top of
-the statepoint.py module and PyQt provides mesh tally
-plotting. \autoref{fig:meshplot} shows a screenshot of the PyQt mesh tally
+the statepoint.py module and Tkinter provides mesh tally
+plotting. \autoref{fig:meshplot} shows a screenshot of the Tkinter mesh tally
 plotting application. Alternatively, a separate Python utility is provided to
 process mesh tallies from statepoints into VTK or SILO files.  For example,
 \autoref{fig:3dplot} shows a 3D visualization of a mesh tally in ParaView.
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.5\textwidth]{images/plotmeshtally.png}
-  \caption{Example of PyQt mesh tally plotting application displaying a radial
-    flux distribution.}
+  \includegraphics[width=0.45\textwidth]{images/plotmeshtally.png}
+  \caption{Example of Tkinter mesh tally plotting application displaying a
+    radial flux distribution.}
   \label{fig:meshplot}
 \end{figure}
 \begin{figure}[htb]
@@ -525,7 +556,7 @@ process mesh tallies from statepoints into VTK or SILO files.  For example,
 \end{figure}
 
 State point files (and other binary files) can be written either in a raw binary
-format or in HDF5 format \cite{hdf5-koranne-2011}. While the HDF5 format should
+format or in HDF5 format \citep{hdf5-koranne-2011}. While the HDF5 format should
 be preferred and ensures portability across different architectures, the former
 is made available to ensure that users can take advantage of state point
 capabilities even on systems where HDF5 is unavailable.
@@ -564,7 +595,7 @@ various issues on separate Google Groups mailing lists.
 
 All documentation for OpenMC is written in a markup language called
 reStructuredText. This markup format can be parsed and translated by Sphinx
-\cite{sphinx-2013} to produce documentation as a website (.html), a PDF, or
+\citep{sphinx-2013} to produce documentation as a website (.html), a PDF, or
 various other formats.
 
 \subsection{Version Control and Workflow}
@@ -578,8 +609,8 @@ in collaborating with one another, testing out new ideas, and documenting their
 work.
 
 Active development on OpenMC is conducted using an integration-manager workflow
-as described by Chacon \cite{chacon-2009}. This workflow works particularly well
-with the GitHub hosting service that is used by OpenMC. On GitHub, each
+as described by Chacon \citep{chacon-2009}. This workflow works particularly
+well with the GitHub hosting service that is used by OpenMC. On GitHub, each
 developer can easily fork a project creating their own public copy of the OpenMC
 repository. They are then free to make whatever changes and modifications they
 wish and are not required to have any special access on the original
@@ -629,6 +660,9 @@ Advanced Scientific Computing Research, Office of Science, U.S. Department of
 Energy, under Contract DE-AC02-06CH11357.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bibliographystyle{ans}
+\section*{References}
+
+\bibliographystyle{elsarticle-harv}
 \bibliography{references}
+
 \end{document}

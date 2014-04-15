@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+
+matplotlib.rcParams['ps.useafm'] = True
+matplotlib.rcParams['pdf.use14corefonts'] = True
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble'] = ['\usepackage[bitstream-charter]{mathdesign}']
+matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 
 # Scaling on ORNL OLCF Jaguar (Cray XK6)
 cray_x = np.array([32,64,128,256,512,1024,2048,4096,
@@ -30,9 +37,10 @@ plt.loglog(bgp_x, bgp_ideal, 'k-', label='Blue Gene/P Ideal')
 plt.gca().set_xscale('log',basex=2)
 plt.xlabel('Number of Processors')
 plt.ylabel('Particles per second')
-plt.grid(True, which='both')
+plt.grid(True, which='both', color='lightgray', ls='-', alpha=0.7)
+plt.gca().set_axisbelow(True)
 plt.legend(loc='upper left')
 
 # Save figure
 # plt.show()
-plt.savefig('scaling_loglog.pdf')
+plt.savefig('scaling_loglog.pdf', bbox_inches='tight')

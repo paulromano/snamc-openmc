@@ -4,9 +4,5 @@
 # emacs temporaries
 *~
 
-# LateX output
-*.aux
-*.bbl
-*.blg
-*.log
-*.out
+# Build directory
+build

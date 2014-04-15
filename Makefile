@@ -1,11 +1,11 @@
 # Name of manuscript
-manuscript = snamc-openmc
+manuscript = ane-openmc-si
 
 # PdfLaTeX compilation options
-latexopt = -halt-on-error -file-line-error
+latexopt = -halt-on-error -file-line-error -output-directory=build
 
 # List of images to include
-images = 
+images = images/scaling_loglog.pdf
 
 #=================================================================
 # Generate PDF of manuscript using PdfLaTeX
@@ -14,8 +14,9 @@ images =
 all: $(manuscript).pdf
 
 $(manuscript).pdf: $(manuscript).tex $(images) references.bib
+	mkdir -p build
 	pdflatex $(latexopt) $(manuscript)
-	bibtex -terse $(manuscript)
+	bibtex -terse build/$(manuscript)
 	pdflatex $(latexopt) $(manuscript)
 	pdflatex $(latexopt) $(manuscript)
 
@@ -23,15 +24,14 @@ $(manuscript).pdf: $(manuscript).tex $(images) references.bib
 # Generate Images
 #=================================================================
 
-%.pdf: make_plots.py
-	python $<
+images/scaling_loglog.pdf: images/make_plot.py
+	cd images; python make_plot.py
 
 #=================================================================
 # Other
 #=================================================================
 
 clean:
-	@rm -f *.aux *.bbl *.blg *.log *.out *.spl $(manuscript).pdf \
-    $(images)
+	rm -fr build
 
 .PHONY: all clean
